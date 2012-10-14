@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-form-field-FileButton'>/**
+</span> *
+ */
+Ext.define('Ext.form.field.FileButton', {
+    extend: 'Ext.button.Button',
+    alias: 'widget.filebutton',
+    
+    childEls: [
+        'btnEl', 'btnWrap', 'btnInnerEl', 'btnIconEl', 'fileInputEl'
+    ],
+    
+    inputCls: Ext.baseCSSPrefix + 'form-file-input',
+    
+    cls: Ext.baseCSSPrefix + 'form-file-btn',
+    
+    preventDefault: false,
+
+    renderTpl: [
+        '&lt;em id=&quot;{id}-btnWrap&quot;&lt;tpl if=&quot;splitCls&quot;&gt; class=&quot;{splitCls}&quot;&lt;/tpl&gt;&gt;',
+            '&lt;button id=&quot;{id}-btnEl&quot; type=&quot;{type}&quot; class=&quot;{btnCls}&quot; hidefocus=&quot;true&quot;',
+                // the autocomplete=&quot;off&quot; is required to prevent Firefox from remembering
+                // the button's disabled state between page reloads.
+                '&lt;tpl if=&quot;tabIndex&quot;&gt; tabIndex=&quot;{tabIndex}&quot;&lt;/tpl&gt;',
+                '&lt;tpl if=&quot;disabled&quot;&gt; disabled=&quot;disabled&quot;&lt;/tpl&gt;',
+                ' role=&quot;button&quot; autocomplete=&quot;off&quot;&gt;',
+                '&lt;span id=&quot;{id}-btnInnerEl&quot; class=&quot;{baseCls}-inner&quot; style=&quot;{innerSpanStyle}&quot;&gt;',
+                    '{text}',
+                '&lt;/span&gt;',
+                '&lt;span id=&quot;{id}-btnIconEl&quot; class=&quot;{baseCls}-icon {iconCls}&quot;&lt;tpl if=&quot;iconUrl&quot;&gt; style=&quot;background-image:url({iconUrl})&quot;&lt;/tpl&gt;&gt;&lt;/span&gt;',
+            '&lt;/button&gt;',
+        '&lt;/em&gt;',
+        '&lt;input id=&quot;{id}-fileInputEl&quot; class=&quot;{inputCls}&quot; type=&quot;file&quot; size=&quot;1&quot; name=&quot;{inputName}&quot;&gt;'
+    ],
+    
+    getTemplateArgs: function(){
+        var args = this.callParent();
+        args.inputCls = this.inputCls;
+        args.inputName = this.inputName;
+        return args;
+    },
+    
+    afterRender: function(){
+        var me = this;
+        me.callParent(arguments);
+        me.fileInputEl.on('change', me.fireChange, me);    
+    },
+    
+    fireChange: function(e){
+        this.fireEvent('change', this, e, this.fileInputEl.dom.value);
+    },
+    
+<span id='Ext-form-field-FileButton-method-createFileInput'>    /**
+</span>     * @private
+     * Creates the file input element. It is inserted into the trigger button component, made
+     * invisible, and floated on top of the button's other content so that it will receive the
+     * button's clicks.
+     */
+    createFileInput : function() {
+        var me = this;
+        me.fileInputEl = me.el.createChild({
+            name: me.inputName,
+            id: me.id + '-fileInputEl',
+            cls: me.inputCls,
+            tag: 'input',
+            type: 'file',
+            size: 1
+        });
+        me.fileInputEl.on('change', me.fireChange, me);  
+    },
+    
+    reset: function(){
+        this.fileInputEl.remove();
+        this.createFileInput();
+    },
+    
+    onDisable: function(){
+        this.callParent();
+        this.fileInputEl.dom.disabled = true;
+    }
+});
+</pre>
+</body>
+</html>

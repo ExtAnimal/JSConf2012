@@ -1,0 +1,51 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../../resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../shared/example.css" />
+<link rel="stylesheet" type="text/css" href="panel.css" />
+<script type="text/javascript" src="../../ext-all.js"></script>
+<script type="text/javascript">
+    Ext.require('*');
+    Ext.onReady(function() {
+        p = Ext.create('Ext.panel.Panel', {
+            id: 'panel',
+            renderTo: document.body,
+            height: 115,
+            width: 500,
+            title: 'Test 2',
+            titleAlign: 'center',
+            header: {
+                height: 25,
+                id: 'header',
+                items: [{
+                    id: 'dataview',
+                    tpl: 'You are here: <tpl for="."><a href="{url}">{title}</a>{[xindex < xcount ? " > " : ""]}</tpl>',
+                    itemSelector: 'a',
+                    xtype: 'dataview',
+                    deferInitialRefresh: false,
+                    height: 13,
+                    store: {
+                        type: 'array',
+                        data: [
+                            [ 'Start page', '#startHash'],
+                            [ 'Drill down', '#secondHash' ],
+                            [ 'And down again', '#thirdHash']
+                        ],
+                        fields: [ 'title', 'url']
+                    }
+                }, {
+                    id: 'spacer',
+                    xtype: 'component',
+                    html: '&#160;',
+                    width: 20,
+                    height: 1
+                }]
+            },
+            html: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        });
+    })
+</script>
+</head>
+<body>
+</body>
+</html>
