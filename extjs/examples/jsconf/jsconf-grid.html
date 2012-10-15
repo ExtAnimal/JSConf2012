@@ -1,0 +1,150 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../../resources/css/ext-all.css"/>
+<script type="text/javascript" src="../../ext-all.js"></script>
+<script type="text/javascript">
+/**
+    * Returns an array of fake data
+    * @param {Number} count The number of fake rows to create data for
+    * @return {Array} The fake record data, suitable for usage with an ArrayReader
+    */
+function createFakeData(count) {
+    var firstNames   = ['Ed', 'Tommy', 'Aaron', 'Abe', 'Jamie', 'Adam', 'Dave', 'David', 'Jay', 'Nicolas', 'Nige'],
+        lastNames    = ['Spencer', 'Maintz', 'Conran', 'Elias', 'Avins', 'Mishcon', 'Kaneda', 'Davis', 'Robinson', 'Ferrero', 'White'],
+        ratings      = [1, 2, 3, 4, 5],
+        salaries     = [100, 400, 900, 1500, 1000000];
+
+    var data = [];
+    for (var i = 0; i < (count || 25); i++) {
+        var ratingId    = Math.floor(Math.random() * ratings.length),
+            salaryId    = Math.floor(Math.random() * salaries.length),
+            firstNameId = Math.floor(Math.random() * firstNames.length),
+            lastNameId  = Math.floor(Math.random() * lastNames.length),
+
+            rating      = ratings[ratingId],
+            salary      = salaries[salaryId],
+            name        = Ext.String.format("{0} {1}", firstNames[firstNameId], lastNames[lastNameId]);
+
+        data.push({
+            id: 'rec-' + i,
+            rating: rating,
+            salary: salary,
+            name: name
+        });
+    }
+    return data;
+}
+
+Ext.require([
+    'Ext.selection.CellModel',
+    'Ext.grid.*',
+    'Ext.data.*'
+]);
+
+Ext.onReady(function() {
+    Ext.QuickTips.init();
+
+    // Define the layout of the Employee entity
+    Ext.define('Employee', {
+        extend: 'Ext.data.Model',
+        fields: [
+            {name: 'rating', type: 'int'},
+            {name: 'salary', type: 'float'},
+            {name: 'name'}
+        ]
+    });
+
+    // Create the Data Store reading an array of generated data.
+    var store = Ext.create('Ext.data.Store', {
+        id: 'store',
+        data: createFakeData(500),
+        model: 'Employee',
+        proxy: {
+            type: 'memory',
+            reader: 'json'
+        }
+    });
+
+    // create the grid and specify what field you want
+    // to use for the editor at each header.
+    var grid = Ext.create('Ext.grid.Panel', {
+        store: store,
+        columns:[{
+            xtype: 'rownumberer',
+            width: 40,
+            sortable: false
+        },{
+            text: 'Name',
+            flex:1 ,
+            sortable: true,
+            dataIndex: 'name'
+        },{
+            text: 'Rating',
+            width: 125,
+            sortable: true,
+            dataIndex: 'rating'
+        },{
+            text: 'Salary',
+            width: 125,
+            sortable: true,
+            dataIndex: 'salary',
+            align: 'right',
+            renderer: Ext.util.Format.usMoney
+        }, {
+            xtype: 'actioncolumn',
+            width: 30,
+            sortable: false,
+            bubbleEvents: 'rowDelete',
+            items: [{
+                icon: '../shared/icons/fam/delete.gif',
+                tooltip: 'Delete Plant',
+                handler: function(grid, rowIdx, colIdx) {
+                    this.fireEvent('rowDelete', rowIdx);
+                }
+            }]
+        }],
+        selModel: {
+            selType: 'cellmodel'
+        },
+        listeners: {
+            rowDelete: function(rowIndex) {
+                store.removeAt(rowIndex);
+            }
+        },
+        width: 600,
+        height: 300,
+        title: '500 Employees',
+        frame: true,
+        tbar: [{
+            text: 'Apply Pay Rise slowly',
+            handler : function() {
+                var start = Ext.perf.getTimestamp();
+                for (var i = 0; i < 50; i++) {
+                    store.each(function(record, index) {
+                        record.set('salary', record.get('salary') * 1.001);
+                    });
+                }
+                alert('Raising the pay of everybody 50 times took ' + (Ext.perf.getTimestamp() - start) + 'ms');
+            }
+        }, {
+            text: 'Apply Pay Rise quickly',
+            handler : function() {
+                var start = Ext.perf.getTimestamp();
+                store.suspendEvents();
+                for (var i = 0; i < 50; i++) {
+                    store.each(function(record, index) {
+                        record.set('salary', record.get('salary') * 1.001);
+                    });
+                }
+                store.resumeEvents();
+                grid.view.refresh();
+                alert('Raising the pay of everybody 50 times took ' + (Ext.perf.getTimestamp() - start) + 'ms');
+            }
+        }]
+    });
+    grid.render(document.body);
+});
+</script>
+</head>
+<body style="padding:20px"></body>
+</html>
